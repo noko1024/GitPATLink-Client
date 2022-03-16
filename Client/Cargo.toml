@@ -1,0 +1,12 @@
+[package]
+name = "gpat-cli"
+version = "0.1.0"
+edition = "2021"
+authors = ["noko1024 ynoko1024@gmail.com"]
+description = "GitPATLink CLI Client"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = "3.1.6"
+rust-crypto = "0.2.36"
