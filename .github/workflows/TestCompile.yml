@@ -45,12 +45,9 @@ jobs:
           use-cross: true 
           command: build
           args: --release --target ${{ matrix.target }} --all-features --verbose
-          
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
       
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
          name: CrossCompileFile
-         path: target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+         path: ./target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
