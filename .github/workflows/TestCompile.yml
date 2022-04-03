@@ -20,7 +20,7 @@ jobs:
           - os: ubuntu-latest
             target: x86_64-pc-windows-gnu
             artifact_name: gpat-cli.exe
-            asset_name: x86_64-pc-windows-gnu.exe
+            asset_name: x86_64-pc-windows-gnu
           - os: macos-latest
             target: x86_64-apple-darwin
             artifact_name: gpat-cli
@@ -45,9 +45,7 @@ jobs:
           use-cross: true 
           command: build
           args: --release --target ${{ matrix.target }} --all-features --verbose
-      
-      - run: pwd && ls -al
-      
+          
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
