@@ -1,4 +1,4 @@
-name: Release
+name: TestCompile
 
 on:
   push:
@@ -11,19 +11,19 @@ jobs:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            artifact_name: gpad-cli
+            artifact_name: gpat-cli
             asset_name: x86_64-unknown-linux-gnu
           - os: ubuntu-latest
             target: x86_64-unknown-linux-musl
-            artifact_name: gpad-cli
+            artifact_name: gpat-cli
             asset_name: x86_64-unknown-linux-musl
           - os: ubuntu-latest
             target: x86_64-pc-windows-gnu
-            artifact_name: gpad-cli.exe
+            artifact_name: gpat-cli.exe
             asset_name: x86_64-pc-windows-gnu.exe
           - os: macos-latest
             target: x86_64-apple-darwin
-            artifact_name: gpad-cli
+            artifact_name: gpat-cli
             asset_name: x86_64-apple-darwin
 
 
@@ -51,10 +51,5 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
-         name: ${{ matrix.target }}__${{ matrix.artifact_name }}
+         name: ${{ matrix.target }}
          path: target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
-      - name: Upload Artifact Directory
-        uses: actions/upload-artifact@v3
-        with:
-         name: ${{ matrix.target }}PATH${{ matrix.artifact_name }}RELEASE
-         path: target/${{ matrix.target }}/release
