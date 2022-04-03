@@ -50,4 +50,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
          name: CrossCompileFile
-         path: ./target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+         path:  $GITHUB_WORKSPACE/target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
