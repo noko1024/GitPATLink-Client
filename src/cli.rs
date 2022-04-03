@@ -30,10 +30,14 @@ pub fn  build_cli() -> Command<'static>{
             .required(true)
         )
     )
-    .subcommand(Command::new("get")
+    .subcommand(Command::new("load")
         .about("PAT additions and updates")
         .arg(Arg::new("student ID number")
         .help("pXXXXXX or sXXXXXX")
+            .required(true)
+        )
+        .arg(Arg::new("user name")
+            .help("Your GitHub user name")
             .required(true)
         )
         .arg(Arg::new("password")
@@ -51,6 +55,9 @@ pub fn  build_cli() -> Command<'static>{
         .help("Your password")
         .required(true)
         )
+    )
+    .subcommand(Command::new("get")
+    .about("git credential helper get command")
     );
     return app;
 }

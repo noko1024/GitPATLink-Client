@@ -6,6 +6,7 @@ extern crate reqwest;
 extern crate tokio;
 extern crate base64;
 extern crate clap_complete;
+extern crate proconio;
 
 use aesstream::{AesWriter, AesReader};
 use crypto::aessafe::{AesSafe256Encryptor, AesSafe256Decryptor};
@@ -13,7 +14,9 @@ use bcrypt::hash;
 use std::io::{Read,Write,Cursor};
 use std::process;
 use std::io;
+use std::env;
 use clap_complete::{generate, shells::Bash,shells::Elvish,shells::Fish,shells::PowerShell,shells::Zsh};
+use proconio::input;
 
 mod cli;
 
@@ -57,20 +60,45 @@ async fn main(){
         
 
     }
-    else if let Some(ref matches) = matches.subcommand_matches("get") {
+    else if let Some(ref matches) = matches.subcommand_matches("load") {
         let id = matches.value_of("student ID number").unwrap().to_string();
         let password = matches.value_of("password").unwrap().to_string();
+        let user_name = matches.value_of("user name").unwrap().to_string();
         let hash_password = hash(&password, 10).unwrap();
         println!("{}",hash_password);
         let raw_token = _http_post("/link/api/get",vec![id.clone(),hash_password]).await;
         let token = _decrypt(&password, raw_token);
-        println!("{}",token);
+
+        env::set_var("GIT_TOKEN",token);
+        env::set_var("GIT_USER",user_name)
     }
     else if let Some(ref matches) = matches.subcommand_matches("remove") {
         let id = matches.value_of("student ID number").unwrap().to_string();
         let password = matches.value_of("password").unwrap().to_string();
         println!("{}",id);
         println!("{}",password);
+    }
+    else if let Some(ref _matches) = matches.subcommand_matches("get"){
+        input!{
+            protocol: String,
+            host: String
+        }
+            
+        if protocol != "protocol=https" && host != "host=github.com"{
+            process::exit(0);
+        }
+
+        let token = std::env::var("GIT_TOKEN");
+        let user_name = std::env::var("GIT_USER");
+        if token.is_ok() && user_name.is_ok(){
+            println!("protocol=https");
+            println!("host=github.com");
+            println!("username={}",user_name.unwrap());
+            println!("passsword={}",token.unwrap());
+        }
+        else{
+            process::exit(0);
+        }
     }
 
 
