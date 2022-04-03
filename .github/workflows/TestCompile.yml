@@ -46,7 +46,7 @@ jobs:
           command: build
           args: --release --target ${{ matrix.target }} --all-features --verbose
       
-      - run: ls -al && ${{ github.workspace }}/target/${{ matrix.target }}/release/${{ matrix.artifact_name }} help
+      - run: ls -al && target/${{ matrix.target }}/release/${{ matrix.artifact_name }} help
       
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
