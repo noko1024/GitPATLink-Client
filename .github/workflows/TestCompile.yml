@@ -45,8 +45,9 @@ jobs:
           use-cross: true 
           command: build
           args: --release --target ${{ matrix.target }} --all-features --verbose
-
-     - uses: actions/upload-artifact@v3
-      with:
-        name: CrossCompileFile
-          path: target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+         name: CrossCompileFile
+         path: target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
