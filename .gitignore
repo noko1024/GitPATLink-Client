@@ -1,2 +1,2 @@
 #RustのBuild時生成ディレクトリ
-#target/*
+target
