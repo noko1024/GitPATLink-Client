@@ -94,6 +94,7 @@ async fn main(){
 
         let token = std::env::var("GIT_TOKEN");
         let user_name = std::env::var("GIT_USER");
+        //変な入力でも通過できる多分
         if token.is_ok() && user_name.is_ok(){
             println!("protocol=https");
             println!("host=github.com");
@@ -121,7 +122,7 @@ async fn main(){
         let mut encrypted = vec![];
         {
             let writer = AesWriter::new(&mut encrypted, encryptor);
-            writer.unwrap().write_all(source.as_bytes());
+            let _ = writer.unwrap().write_all(source.as_bytes());
         }
         return base64::encode(encrypted);
     }
@@ -142,7 +143,7 @@ async fn main(){
         let decryptor = AesSafe256Decryptor::new(&key_array);
         let reader = AesReader::new(Cursor::new(decoded), decryptor);
         let mut decrypted = Vec::new();
-        reader.unwrap().read_to_end(&mut decrypted);
+        let _ = reader.unwrap().read_to_end(&mut decrypted);
         return String::from_utf8(decrypted).unwrap();
     }
 
