@@ -80,16 +80,26 @@ async fn main(){
         println!("{}",password);
     }
     else if let Some(ref _matches) = matches.subcommand_matches("get"){
-        let stdin = std::io::stdin();
-        let mut source = LineSource::new(stdin.lock());
-        input!{
-            from &mut source,
-            protocol: String,
-            host: String
+        let mut input_user_auth = vec![];
+        loop {
+            let mut word = String::new();
+            std::io::stdin().read_line(&mut word).ok();
+            let input_string = word.trim().to_string();
+            if input_string == "" {
+                break;
+            }
+            else {
+                input_user_auth.push(input_string);
+            }
         }
-        drop(source);
-        if protocol != "protocol=https" && host != "host=github.com"{
-            process::exit(0);
+        if input_user_auth.len() != 2{
+            println!("Format Error");
+            process::exit(1);
+        }
+        else{
+            if input_user_auth[0] != "protocol=https" && input_user_auth[1] != "host=github.com"{
+                process::exit(0);
+            }   
         }
 
         let token = std::env::var("GIT_TOKEN");
