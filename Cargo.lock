@@ -242,7 +242,6 @@ dependencies = [
  "bcrypt",
  "clap",
  "clap_complete",
- "proconio",
  "reqwest",
  "rust-crypto",
  "tokio",
@@ -557,15 +556,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c7342d5883fbccae1cc37a2353b09c87c9b0f3afd73f5fb9bba687a1f733b029"
 dependencies = [
  "unicode-xid",
-]
-
-[[package]]
-name = "proconio"
-version = "0.4.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "91c333be3af2936f8e810300bc74fe4d0cc168ebc04ab02a28c5b1060fa1bd59"
-dependencies = [
- "lazy_static",
 ]
 
 [[package]]

@@ -57,7 +57,13 @@ pub fn  build_cli() -> Command<'static>{
         )
     )
     .subcommand(Command::new("get")
-    .about("git credential helper get command")
+    .about("git credential helper command")
+    )
+    .subcommand(Command::new("store")
+    .about("git credential helper command")
+    )
+    .subcommand(Command::new("erase")
+    .about("git credential helper command")
     );
     return app;
 }

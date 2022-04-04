@@ -6,7 +6,6 @@ extern crate reqwest;
 extern crate tokio;
 extern crate base64;
 extern crate clap_complete;
-extern crate proconio;
 
 use aesstream::{AesWriter, AesReader};
 use crypto::aessafe::{AesSafe256Encryptor, AesSafe256Decryptor};
@@ -16,8 +15,6 @@ use std::process;
 use std::io;
 use std::env;
 use clap_complete::{generate, shells::Bash,shells::Elvish,shells::Fish,shells::PowerShell,shells::Zsh};
-use proconio::input;
-use proconio::source::line::LineSource;
 
 mod cli;
 
@@ -79,7 +76,7 @@ async fn main(){
         println!("{}",id);
         println!("{}",password);
     }
-    else if let Some(ref _matches) = matches.subcommand_matches("get"){
+    else if let Some(ref __) = matches.subcommand_matches("get"){
         let mut input_user_auth = vec![];
         loop {
             let mut word = String::new();
@@ -93,15 +90,15 @@ async fn main(){
             }
         }
         if input_user_auth.len() != 2{
-            println!("Format Error");
+            println!("{:?}",input_user_auth);
             process::exit(1);
         }
         else{
             if input_user_auth[0] != "protocol=https" && input_user_auth[1] != "host=github.com"{
                 process::exit(0);
-            }   
+            }
         }
-
+    
         let token = std::env::var("GIT_TOKEN");
         let user_name = std::env::var("GIT_USER");
         //変な入力でも通過できる多分
@@ -115,6 +112,13 @@ async fn main(){
             process::exit(0);
         }
     }
+    else if let Some(ref __) = matches.subcommand_matches("store"){
+        std::process::exit(0)
+    }
+    else if let Some(ref __) = matches.subcommand_matches("erase"){
+        std::process::exit(0)
+    }
+
 
 
     fn _encrypt(password:&str, source:String) -> String  {
