@@ -17,6 +17,7 @@ use std::io;
 use std::env;
 use clap_complete::{generate, shells::Bash,shells::Elvish,shells::Fish,shells::PowerShell,shells::Zsh};
 use proconio::input;
+use proconio::source::line::LineSource;
 
 mod cli;
 
@@ -79,13 +80,14 @@ async fn main(){
         println!("{}",password);
     }
     else if let Some(ref _matches) = matches.subcommand_matches("get"){
+        let stdin = std::io::stdin();
+        let mut source = LineSource::new(stdin.lock());
         input!{
-            protocol: String
-        }
-        input!{
+            from &mut source,
+            protocol: String,
             host: String
         }
-            
+        drop(source);
         if protocol != "protocol=https" && host != "host=github.com"{
             process::exit(0);
         }
