@@ -80,7 +80,9 @@ async fn main(){
     }
     else if let Some(ref _matches) = matches.subcommand_matches("get"){
         input!{
-            protocol: String,
+            protocol: String
+        }
+        input!{
             host: String
         }
             
