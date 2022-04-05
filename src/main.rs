@@ -89,7 +89,7 @@ async fn main(){
                 input_user_auth.push(input_string);
             }
         }
-        if input_user_auth.len() <= 2{
+        if input_user_auth.len() <= 1{
             process::exit(1);
         }
         else{
