@@ -6,6 +6,7 @@ extern crate reqwest;
 extern crate tokio;
 extern crate base64;
 extern crate clap_complete;
+extern crate uptime_lib;
 
 use aesstream::{AesWriter, AesReader};
 use crypto::aessafe::{AesSafe256Encryptor, AesSafe256Decryptor};
@@ -15,11 +16,18 @@ use std::process;
 use std::io;
 use std::env;
 use clap_complete::{generate, shells::Bash,shells::Elvish,shells::Fish,shells::PowerShell,shells::Zsh};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 mod cli;
 
 #[tokio::main]
 async fn main(){
+    let now_unix = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_micros();
+    let now_uptime = uptime_lib::get().unwrap().as_micros();
+    let boot_time = (now_unix - now_uptime)/1000;
+    println!("unix_time={}",now_unix);
+    println!("uptime={}",now_uptime);
+    println!("boot_time={}",boot_time);
     // 引数を解析
     let matches = cli::build_cli().get_matches();
 
