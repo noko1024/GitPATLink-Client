@@ -22,11 +22,11 @@ mod cli;
 
 #[tokio::main]
 async fn main(){
-    let now_unix = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_micros();
-    let now_uptime = uptime_lib::get().unwrap().as_micros();
-    let boot_time = (now_unix - now_uptime)/1000;
-    println!("unix_time={}",now_unix);
-    println!("uptime={}",now_uptime);
+    let now_unix = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    let now_uptime = uptime_lib::get().unwrap();
+    let boot_time = (now_unix - now_uptime).as_secs();
+    println!("unix_time={}",now_unix.as_secs_f64());
+    println!("uptime={}",now_uptime.as_secs_f64());
     println!("boot_time={}",boot_time);
     // 引数を解析
     let matches = cli::build_cli().get_matches();
