@@ -7,6 +7,7 @@ extern crate tokio;
 extern crate base64;
 extern crate clap_complete;
 extern crate uptime_lib;
+extern crate rand;
 
 use aesstream::{AesWriter, AesReader};
 use crypto::aessafe::{AesSafe256Encryptor, AesSafe256Decryptor};
@@ -17,6 +18,8 @@ use std::io;
 use std::env;
 use clap_complete::{generate, shells::Bash,shells::Elvish,shells::Fish,shells::PowerShell,shells::Zsh};
 use std::time::{SystemTime, UNIX_EPOCH};
+use rand::{Rng,SeedableRng};
+use rand::seq::SliceRandom;
 
 mod cli;
 
@@ -28,6 +31,8 @@ async fn main(){
     println!("unix_time={}",now_unix.as_secs_f64());
     println!("uptime={}",now_uptime.as_secs_f64());
     println!("boot_time={}",boot_time);
+    _gen_password(32, boot_time);
+    
     // 引数を解析
     let matches = cli::build_cli().get_matches();
 
@@ -126,7 +131,18 @@ async fn main(){
         std::process::exit(0)
     }
 
-
+fn _gen_password(size: usize,seed:u64) {
+    const BASE : &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; 
+    let mut rng :rand::rngs::StdRng = SeedableRng::seed_from_u64(seed);
+    println!("{}",
+    String::from_utf8(
+        BASE.as_bytes()
+            .choose_multiple(&mut rng , size)
+            .cloned()
+            .collect()
+    ).unwrap());
+    std::process::exit(0);
+}
 
     fn _encrypt(password:&str, source:String) -> String  {
         const PASSWORD_SIZE: usize = 32;
