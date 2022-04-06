@@ -16,23 +16,18 @@ use std::io::{Read,Write,Cursor};
 use std::process;
 use std::io;
 use std::env;
+//use std::path::Path;
+use std::fs::File;
+//use std::io::{BufRead,BufReader,BufWriter};
 use clap_complete::{generate, shells::Bash,shells::Elvish,shells::Fish,shells::PowerShell,shells::Zsh};
 use std::time::{SystemTime, UNIX_EPOCH};
-use rand::{Rng,SeedableRng};
+use rand::SeedableRng;
 use rand::seq::SliceRandom;
 
 mod cli;
 
 #[tokio::main]
 async fn main(){
-    let now_unix = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-    let now_uptime = uptime_lib::get().unwrap();
-    let boot_time = (now_unix - now_uptime).as_secs();
-    println!("unix_time={}",now_unix.as_secs_f64());
-    println!("uptime={}",now_uptime.as_secs_f64());
-    println!("boot_time={}",boot_time);
-    _gen_password(32, boot_time);
-    
     // 引数を解析
     let matches = cli::build_cli().get_matches();
 
@@ -76,13 +71,37 @@ async fn main(){
         let password = matches.value_of("password").unwrap().to_string();
         let user_name = matches.value_of("user name").unwrap().to_string();
         let hash_password = hash(&password, 10).unwrap();
-        println!("{}",hash_password);
         let raw_token = _http_post("/link/api/get",vec![id.clone(),hash_password]).await;
         let token = _decrypt(&password, raw_token);
 
-        env::set_var("GIT_TOKEN",token);
-        env::set_var("GIT_USER",user_name)
+        //ファイル保存のため暗号化
+        let _user_info = user_name+","+&token;
+        println!("{}",_user_info);
+        let file_enc_password = _gen_password(32,_get_boot_time());
+        println!("{}",file_enc_password);
+        let encrypted_token = _encrypt(&file_enc_password,_user_info);
+        println!("{}",encrypted_token);
+        let mut save_file_path = env::current_exe().unwrap();
+        save_file_path.pop();
+        save_file_path.push(".gpadinfo");
+        //書き込み準備
+        let mut gpad_info_file = match File::create(save_file_path){
+            Ok(file) => file,
+            Err(_) => {
+                println!("File Open Error");
+                std::process::exit(1);
+            }
+        };
+        //書き込み
+        match gpad_info_file.write_all(encrypted_token.as_bytes()){
+            Ok(_) => std::process::exit(0),
+            Err(_) => {
+                    println!("File Write Error");
+                    std::process::exit(1)                
+            }
+        }
     }
+
     else if let Some(ref matches) = matches.subcommand_matches("remove") {
         let id = matches.value_of("student ID number").unwrap().to_string();
         let password = matches.value_of("password").unwrap().to_string();
@@ -110,19 +129,22 @@ async fn main(){
                 process::exit(0);
             }
         }
-    
-        let token = std::env::var("GIT_TOKEN");
-        let user_name = std::env::var("GIT_USER");
-        //変な入力でも通過できる多分
-        if token.is_ok() && user_name.is_ok(){
-            println!("protocol=https");
-            println!("host=github.com");
-            println!("username={}",user_name.unwrap());
-            println!("passsword={}",token.unwrap());
-        }
-        else{
-            process::exit(0);
-        }
+
+        let mut save_file_path = env::current_exe().unwrap();
+        save_file_path.pop();
+        save_file_path.push(".gpadinfo");
+        
+        //書き込み準備
+        let raw_user_info = std::fs::read_to_string(save_file_path).unwrap();
+        let file_enc_password = _gen_password(32,_get_boot_time());
+        let decrypted_user_info =  _decrypt(&file_enc_password,raw_user_info);
+        let user_info = decrypted_user_info.split(",").collect::<Vec<&str>>();
+
+        println!("protocol=https");
+        println!("host=github.com");
+        println!("username={}",user_info[0]);
+        println!("passsword={}",user_info[1]);
+        
     }
     else if let Some(ref __) = matches.subcommand_matches("store"){
         std::process::exit(0)
@@ -131,17 +153,24 @@ async fn main(){
         std::process::exit(0)
     }
 
-fn _gen_password(size: usize,seed:u64) {
+fn _get_boot_time() -> u64{
+    let now_unix = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    let now_uptime = uptime_lib::get().unwrap();
+    let boot_time = (now_unix - now_uptime).as_secs();
+    return boot_time
+}
+
+fn _gen_password(size: usize,seed:u64) -> String {
     const BASE : &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; 
     let mut rng :rand::rngs::StdRng = SeedableRng::seed_from_u64(seed);
-    println!("{}",
-    String::from_utf8(
+
+    let passsword = String::from_utf8(
         BASE.as_bytes()
             .choose_multiple(&mut rng , size)
             .cloned()
             .collect()
-    ).unwrap());
-    std::process::exit(0);
+    ).unwrap();
+    return passsword
 }
 
     fn _encrypt(password:&str, source:String) -> String  {
@@ -203,10 +232,9 @@ fn _gen_password(size: usize,seed:u64) {
             .send()
             .await;
             
-        let response_data;
-        match response {
-            Ok(o) => {response_data = o;}
-            Err(_r) => {
+        let response_data = match response {
+            Ok(res) => res,
+            Err(_) => {
                 println!("NetworkError");
                 process::exit(1);
             }
