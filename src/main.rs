@@ -134,10 +134,19 @@ async fn main(){
         save_file_path.pop();
         save_file_path.push(".gpadinfo");
         
-        //書き込み準備
-        let raw_user_info = std::fs::read_to_string(save_file_path).unwrap();
+        //ファイルからuser_infoを読み込み
+        let raw_user_info = match std::fs::read_to_string(save_file_path){
+            Ok(data) => data,
+            Err(__) => {
+                println!("File Read Error");
+                std::process::exit(1);
+            }
+        };
+        //password生成
         let file_enc_password = _gen_password(32,_get_boot_time());
+        //復号化
         let decrypted_user_info =  _decrypt(&file_enc_password,raw_user_info);
+        //csvで保存しているのでVecへデシリアライズ
         let user_info = decrypted_user_info.split(",").collect::<Vec<&str>>();
 
         println!("protocol=https");
@@ -187,8 +196,15 @@ fn _gen_password(size: usize,seed:u64) -> String {
         let encryptor = AesSafe256Encryptor::new(&key_array);
         let mut encrypted = vec![];
         {
-            let writer = AesWriter::new(&mut encrypted, encryptor);
-            let _ = writer.unwrap().write_all(source.as_bytes());
+            let mut writer = match AesWriter::new(&mut encrypted, encryptor){
+                Ok(writer_data) => writer_data,
+                Err(__) => {
+                    println!("Encrypt Error");
+                    std::process::exit(1);
+                }
+            };
+            let _ = writer.write_all(source.as_bytes());
+            
         }
         return base64::encode(encrypted);
     }
@@ -207,10 +223,23 @@ fn _gen_password(size: usize,seed:u64) -> String {
             key_array[i] = key[i];
         }
         let decryptor = AesSafe256Decryptor::new(&key_array);
-        let reader = AesReader::new(Cursor::new(decoded), decryptor);
+        let mut reader = match AesReader::new(Cursor::new(decoded), decryptor){
+            Ok(reader_data) => reader_data,
+            Err(__) => {
+                println!("Decrypt Error");
+                std::process::exit(1);
+            }
+        };
         let mut decrypted = Vec::new();
-        let _ = reader.unwrap().read_to_end(&mut decrypted);
-        return String::from_utf8(decrypted).unwrap();
+        let _ = reader.read_to_end(&mut decrypted);
+        let decoded_data = match String::from_utf8(decrypted){
+            Ok(data) => data,
+            Err(__) => {
+                println!("base64 decode Error"); 
+                std::process::exit(1);
+            }
+        };
+        return decoded_data;
     }
 
 
