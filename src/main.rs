@@ -16,9 +16,7 @@ use std::io::{Read,Write,Cursor};
 use std::process;
 use std::io;
 use std::env;
-//use std::path::Path;
 use std::fs::File;
-//use std::io::{BufRead,BufReader,BufWriter};
 use clap_complete::{generate, shells::Bash,shells::Elvish,shells::Fish,shells::PowerShell,shells::Zsh};
 use std::time::{SystemTime, UNIX_EPOCH};
 use rand::SeedableRng;
@@ -152,7 +150,7 @@ async fn main(){
         println!("protocol=https");
         println!("host=github.com");
         println!("username={}",user_info[0]);
-        println!("passsword={}",user_info[1]);
+        println!("password={}",user_info[1]);
         
     }
     else if let Some(ref __) = matches.subcommand_matches("store"){
