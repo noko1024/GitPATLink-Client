@@ -57,11 +57,12 @@ async fn main(){
         let user_name = matches.value_of("user name").unwrap().to_string();
         let token = matches.value_of("Pasonal Access Token").unwrap().to_string();
 
+        /*
         println!("id={}",id);
         println!("password={}",password);
         println!("user_name={}",user_name);
         println!("token={}",token);
-
+        */
 
         //Pasonal Access Tokenを passwordで暗号化
         let enc_token = _encrypt(&password,token);
@@ -73,9 +74,9 @@ async fn main(){
 
         let user_info = format!("{},{}",user_name,enc_token);
 
-        println!("{:?}",vec![id.clone(),hash_password.clone(),user_info.clone()]);
-        let res = _http_post("/link/api/add",vec![id,hash_password,user_info]).await;
-        println!("{:?}",res);
+        //println!("{:?}",vec![id.clone(),hash_password.clone(),user_info.clone()]);
+        let _res = _http_post("/link/api/add",vec![id,hash_password,user_info]).await;
+        //println!("{:?}",res);
         
 
     }
@@ -93,11 +94,11 @@ async fn main(){
 
         //ファイル保存のため暗号化
         let user_info = user_name+","+&token;
-        println!("{}",user_info);
+        //println!("{}",user_info);
         let file_enc_password = _gen_password(32,_get_boot_time());
-        println!("{}",file_enc_password);
+        //println!("{}",file_enc_password);
         let encrypted_user_info = _encrypt(&file_enc_password,user_info);
-        println!("{}",encrypted_user_info);
+        //println!("{}",encrypted_user_info);
         let mut save_file_path = env::current_exe().unwrap();
         save_file_path.pop();
         save_file_path.push(".gpadinfo");
@@ -122,8 +123,8 @@ async fn main(){
     else if let Some(ref matches) = matches.subcommand_matches("remove") {
         let id = matches.value_of("student ID number").unwrap().to_string();
         let password = matches.value_of("password").unwrap().to_string();
-        println!("{}",id);
-        println!("{}",password);
+        //println!("{}",id);
+        //println!("{}",password);
         let mut hasher = Sha256::new();
         hasher.input_str(&password.to_string());
         let hash_password = hasher.result_str();
@@ -274,10 +275,10 @@ fn _gen_password(size: usize,seed:u64) -> String {
         }
         else{
             request_body = format!("{{\"id\":\"{}\",\"password\":\"{}\",\"userinfo\":\"{}\"}}", user_auth_info[0],user_auth_info[1],user_auth_info[2]);
-            println!("{}",request_body)
+            //println!("{}",request_body)
         }
         let client = reqwest::Client::new();
-        print!("{}",request_body);
+        //print!("{}",request_body);
         let response = client.post(api_root+api_end_point)
             .header("Content-Type","application/json")
             .body(request_body)
@@ -297,8 +298,8 @@ fn _gen_password(size: usize,seed:u64) -> String {
             let res = response_data.text().await.unwrap();
 
             let res_text = res.split(",").map(|s| s.to_string()).collect::<Vec<String>>();
-            println!("{}",status_code);
-            println!("{:?}",res_text);
+            //println!("{}",status_code);
+            //println!("{:?}",res_text);
             return res_text;
         }
         else if status_code == 400{
@@ -314,27 +315,27 @@ fn _gen_password(size: usize,seed:u64) -> String {
             println!("Error:Auth Error");
             println!("Hint:1. Is your password wrong?");
             println!("Hint:2. Possibility that the authentication information has not been registered.");
-            let res = response_data.text().await;
-            let res_text = res.unwrap();
-            println!("{}",status_code);
-            println!("{}",res_text);
+            let _res = response_data.text().await;
+            //let res_text = res.unwrap();
+            //println!("{}",status_code);
+            //println!("{}",res_text);
             process::exit(1)
         }
         else if status_code == 404{
             println!("Error:Client Adress Error");
             println!("Please contact the developer.");
-            let res = response_data.text().await;
-            let res_text = res.unwrap();
-            println!("{}",status_code);
-            println!("{}",res_text);
+            let _res = response_data.text().await;
+            //let res_text = res.unwrap();
+            //println!("{}",status_code);
+            //println!("{}",res_text);
             process::exit(1)
         }
         else{
             println!("Error:Internal Server Error. Please try again");
-            let res = response_data.text().await;
-            let res_text = res.unwrap();
-            println!("{}",status_code);
-            println!("{}",res_text);
+            let _res = response_data.text().await;
+            //let res_text = res.unwrap();
+            //println!("{}",status_code);
+            //println!("{}",res_text);
             process::exit(1)
         }
     }
