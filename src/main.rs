@@ -267,7 +267,7 @@ fn _gen_password(size: usize,seed:u64) -> String {
 
 
     async fn _http_post(api_end_point:&str, user_auth_info:Vec<String>) -> Vec<String>{
-        let api_root = "http://localhost:4000".to_string();
+        let api_root = "http://api.main.noko1024.net".to_string();
         let request_body:String;
 
         if user_auth_info.len() <= 2{
