@@ -11,7 +11,8 @@ extern crate rand;
 
 use aesstream::{AesWriter, AesReader};
 use crypto::aessafe::{AesSafe256Encryptor, AesSafe256Decryptor};
-use bcrypt::hash;
+use crypto::digest::Digest;
+use crypto::sha2::Sha256;
 use std::io::{Read,Write,Cursor};
 use std::process;
 use std::io;
@@ -53,32 +54,50 @@ async fn main(){
     else if let Some(ref matches) = matches.subcommand_matches("add") {
         let id = matches.value_of("student ID Number").unwrap().to_string();
         let password = matches.value_of("password").unwrap().to_string();
+        let user_name = matches.value_of("user name").unwrap().to_string();
         let token = matches.value_of("Pasonal Access Token").unwrap().to_string();
+
+        println!("id={}",id);
+        println!("password={}",password);
+        println!("user_name={}",user_name);
+        println!("token={}",token);
+
+
         //Pasonal Access Tokenを passwordで暗号化
         let enc_token = _encrypt(&password,token);
         //sha256でpasswordをハッシュ化
-        let hash_password = hash(password,10).unwrap();
+        let mut hasher = Sha256::new();
+        hasher.input_str(&password.to_string());
+        let hash_password = hasher.result_str();
 
-        let res = _http_post("/link/api/add",vec![id.clone(),hash_password,enc_token]).await;
-        println!("{}",res)
+
+        let user_info = format!("{},{}",user_name,enc_token);
+
+        println!("{:?}",vec![id.clone(),hash_password.clone(),user_info.clone()]);
+        let res = _http_post("/link/api/add",vec![id,hash_password,user_info]).await;
+        println!("{:?}",res);
         
 
     }
     else if let Some(ref matches) = matches.subcommand_matches("load") {
         let id = matches.value_of("student ID number").unwrap().to_string();
         let password = matches.value_of("password").unwrap().to_string();
-        let user_name = matches.value_of("user name").unwrap().to_string();
-        let hash_password = hash(&password, 10).unwrap();
-        let raw_token = _http_post("/link/api/get",vec![id.clone(),hash_password]).await;
-        let token = _decrypt(&password, raw_token);
+
+        let mut hasher = Sha256::new();
+        hasher.input_str(&password.to_string());
+        let hash_password = hasher.result_str();
+
+        let vec_user_info = _http_post("/link/api/get",vec![id,hash_password]).await;
+        let user_name = vec_user_info[0].to_string();
+        let token = _decrypt(&password, vec_user_info[1].to_string());
 
         //ファイル保存のため暗号化
-        let _user_info = user_name+","+&token;
-        println!("{}",_user_info);
+        let user_info = user_name+","+&token;
+        println!("{}",user_info);
         let file_enc_password = _gen_password(32,_get_boot_time());
         println!("{}",file_enc_password);
-        let encrypted_token = _encrypt(&file_enc_password,_user_info);
-        println!("{}",encrypted_token);
+        let encrypted_user_info = _encrypt(&file_enc_password,user_info);
+        println!("{}",encrypted_user_info);
         let mut save_file_path = env::current_exe().unwrap();
         save_file_path.pop();
         save_file_path.push(".gpadinfo");
@@ -91,7 +110,7 @@ async fn main(){
             }
         };
         //書き込み
-        match gpad_info_file.write_all(encrypted_token.as_bytes()){
+        match gpad_info_file.write_all(encrypted_user_info.as_bytes()){
             Ok(_) => std::process::exit(0),
             Err(_) => {
                     println!("File Write Error");
@@ -105,6 +124,11 @@ async fn main(){
         let password = matches.value_of("password").unwrap().to_string();
         println!("{}",id);
         println!("{}",password);
+        let mut hasher = Sha256::new();
+        hasher.input_str(&password.to_string());
+        let hash_password = hasher.result_str();
+        let __ = _http_post("/link/api/remove",vec![id,hash_password]).await;
+        
     }
     else if let Some(ref __) = matches.subcommand_matches("get"){
         let mut input_user_auth = vec![];
@@ -123,7 +147,7 @@ async fn main(){
             process::exit(1);
         }
         else{
-            if input_user_auth[0] != "protocol=https" && input_user_auth[1] != "host=github.com"{
+            if !(input_user_auth[0] == "protocol=https" && input_user_auth[1] == "host=github.com"){
                 process::exit(0);
             }
         }
@@ -241,7 +265,7 @@ fn _gen_password(size: usize,seed:u64) -> String {
     }
 
 
-    async fn _http_post(api_end_point:&str, user_auth_info:Vec<String>) -> String{
+    async fn _http_post(api_end_point:&str, user_auth_info:Vec<String>) -> Vec<String>{
         let api_root = "http://localhost:4000".to_string();
         let request_body:String;
 
@@ -249,7 +273,8 @@ fn _gen_password(size: usize,seed:u64) -> String {
             request_body = format!("{{\"id\":\"{}\",\"password\":\"{}\"}}", user_auth_info[0],user_auth_info[1]); 
         }
         else{
-            request_body = format!("{{\"id\":\"{}\",\"password\":\"{}\",\"token\":\"{}\"}}", user_auth_info[0],user_auth_info[1],user_auth_info[2]);
+            request_body = format!("{{\"id\":\"{}\",\"password\":\"{}\",\"userinfo\":\"{}\"}}", user_auth_info[0],user_auth_info[1],user_auth_info[2]);
+            println!("{}",request_body)
         }
         let client = reqwest::Client::new();
         print!("{}",request_body);
@@ -269,10 +294,11 @@ fn _gen_password(size: usize,seed:u64) -> String {
 
         let status_code = response_data.status().as_u16();
         if status_code == 200{
-            let res = response_data.text().await;
-            let res_text = res.unwrap();
+            let res = response_data.text().await.unwrap();
+
+            let res_text = res.split(",").map(|s| s.to_string()).collect::<Vec<String>>();
             println!("{}",status_code);
-            println!("{}",res_text);
+            println!("{:?}",res_text);
             return res_text;
         }
         else if status_code == 400{
