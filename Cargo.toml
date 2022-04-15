@@ -16,3 +16,5 @@ aes-stream = "0.2.1"
 reqwest = { version ="0.11.10", default-features = false, features = ["rustls-tls"]}
 tokio = { version = "1", features = ["full"] }
 base64 = "0.13.0"
+uptime_lib = "0.2.1"
+rand = "0.8.5"
