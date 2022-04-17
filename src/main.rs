@@ -17,7 +17,6 @@ use crypto::sha2::Sha256;
 use std::io::{Read,Write,Cursor};
 use std::process;
 use std::io;
-use std::env;
 use std::fs::File;
 use clap_complete::{generate, shells::Bash,shells::Elvish,shells::Fish,shells::PowerShell,shells::Zsh};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -101,7 +100,7 @@ async fn main(){
         let encrypted_user_info = _encrypt(&file_enc_password,user_info);
         //println!("{}",encrypted_user_info);
         let mut save_file_path = dirs::home_dir().unwrap();
-        save_file_path.push(".gpadinfo");
+        save_file_path.push(".gpatinfo");
         //書き込み準備
         let mut gpad_info_file = match File::create(save_file_path){
             Ok(file) => file,
@@ -153,9 +152,8 @@ async fn main(){
             }
         }
 
-        let mut save_file_path = env::current_exe().unwrap();
-        save_file_path.pop();
-        save_file_path.push(".gpadinfo");
+        let mut save_file_path = dirs::home_dir().unwrap();
+        save_file_path.push(".gpatinfo");
         
         //ファイルからuser_infoを読み込み
         let raw_user_info = match std::fs::read_to_string(save_file_path){
@@ -332,7 +330,7 @@ fn _gen_password(size: usize,seed:u64) -> String {
         }
         else{
             println!("Error:Internal Server Error. Please try again");
-            let _res = response_data.text().await;
+            //let res = response_data.text().await;
             //let res_text = res.unwrap();
             //println!("{}",status_code);
             //println!("{}",res_text);
