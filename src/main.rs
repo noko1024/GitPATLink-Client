@@ -100,7 +100,7 @@ async fn main(){
         let encrypted_user_info = _encrypt(&file_enc_password,user_info);
         //println!("{}",encrypted_user_info);
         let mut save_file_path = dirs::home_dir().unwrap();
-        save_file_path.push(".gpadinfo");
+        save_file_path.push(".gpatinfo");
         //書き込み準備
         let mut gpad_info_file = match File::create(save_file_path){
             Ok(file) => file,
@@ -153,7 +153,7 @@ async fn main(){
         }
 
         let mut save_file_path = dirs::home_dir().unwrap();
-        save_file_path.push(".gpadinfo");
+        save_file_path.push(".gpatinfo");
         
         //ファイルからuser_infoを読み込み
         let raw_user_info = match std::fs::read_to_string(save_file_path){
