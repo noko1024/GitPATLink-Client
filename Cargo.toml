@@ -1,7 +1,7 @@
 [package]
 name = "gpat-cli"
-version = "0.1.0"
-edition = "2021"
+version = "1.0.0"
+edition = "2022"
 authors = ["noko1024 ynoko1024@gmail.com"]
 description = "GitPATLink CLI Client"
 
