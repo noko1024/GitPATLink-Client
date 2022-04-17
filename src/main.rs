@@ -8,6 +8,7 @@ extern crate base64;
 extern crate clap_complete;
 extern crate uptime_lib;
 extern crate rand;
+extern crate dirs;
 
 use aesstream::{AesWriter, AesReader};
 use crypto::aessafe::{AesSafe256Encryptor, AesSafe256Decryptor};
@@ -99,8 +100,7 @@ async fn main(){
         //println!("{}",file_enc_password);
         let encrypted_user_info = _encrypt(&file_enc_password,user_info);
         //println!("{}",encrypted_user_info);
-        let mut save_file_path = env::current_exe().unwrap();
-        save_file_path.pop();
+        let mut save_file_path = dirs::home_dir().unwrap();
         save_file_path.push(".gpadinfo");
         //書き込み準備
         let mut gpad_info_file = match File::create(save_file_path){
