@@ -17,7 +17,6 @@ use crypto::sha2::Sha256;
 use std::io::{Read,Write,Cursor};
 use std::process;
 use std::io;
-use std::env;
 use std::fs::File;
 use clap_complete::{generate, shells::Bash,shells::Elvish,shells::Fish,shells::PowerShell,shells::Zsh};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -153,8 +152,7 @@ async fn main(){
             }
         }
 
-        let mut save_file_path = env::current_exe().unwrap();
-        save_file_path.pop();
+        let mut save_file_path = dirs::home_dir().unwrap();
         save_file_path.push(".gpadinfo");
         
         //ファイルからuser_infoを読み込み
@@ -332,7 +330,7 @@ fn _gen_password(size: usize,seed:u64) -> String {
         }
         else{
             println!("Error:Internal Server Error. Please try again");
-            let _res = response_data.text().await;
+            //let res = response_data.text().await;
             //let res_text = res.unwrap();
             //println!("{}",status_code);
             //println!("{}",res_text);
