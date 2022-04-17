@@ -3,7 +3,7 @@ use clap::{Command,Arg,AppSettings};
 
 pub fn  build_cli() -> Command<'static>{
     let app = Command::new("gpad-cli")
-    .version("0.0.1")
+    .version("1.0.0")
     .author("noko1024")
     .about("GitPATLink CLI Client")
     .setting(AppSettings::DeriveDisplayOrder)
