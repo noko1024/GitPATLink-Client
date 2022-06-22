@@ -2,8 +2,8 @@ use clap::{Command,Arg,AppSettings};
 
 
 pub fn  build_cli() -> Command<'static>{
-    let app = Command::new("gpad-cli")
-    .version("1.0.0")
+    let app = Command::new("gpat-cli")
+    .version("1.0.1")
     .author("noko1024")
     .about("GitPATLink CLI Client")
     .setting(AppSettings::DeriveDisplayOrder)
@@ -29,8 +29,8 @@ pub fn  build_cli() -> Command<'static>{
         .help("Your GitHub user name")
         .required(true)
         )
-        .arg(Arg::new("Pasonal Access Token")
-            .help("Your Pasonal Access Token")
+        .arg(Arg::new("Personal Access Token")
+            .help("Your Personal Access Token")
             .required(true)
         )
     )
