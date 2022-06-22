@@ -35,19 +35,19 @@ async fn main(){
         let shell_name = matches.value_of("Shell Name").unwrap().to_string();
 
         if shell_name == "bash" {
-            generate(Bash, &mut cli::build_cli(), "gpad-cli", &mut io::stdout());
+            generate(Bash, &mut cli::build_cli(), "gpat-cli", &mut io::stdout());
         }
         else if shell_name == "zsh" {
-            generate(Zsh, &mut cli::build_cli(), "gpad-cli", &mut io::stdout());
+            generate(Zsh, &mut cli::build_cli(), "gpat-cli", &mut io::stdout());
         }
         else if shell_name == "powershell" {
-            generate(PowerShell, &mut cli::build_cli(), "gpad-cli", &mut io::stdout());
+            generate(PowerShell, &mut cli::build_cli(), "gpat-cli", &mut io::stdout());
         }
         else if shell_name == "fish" {
-            generate(Fish, &mut cli::build_cli(), "gpad-cli", &mut io::stdout());
+            generate(Fish, &mut cli::build_cli(), "gpat-cli", &mut io::stdout());
         }
         else if shell_name == "elvish" {
-            generate(Elvish, &mut cli::build_cli(), "gpad-cli", &mut io::stdout());
+            generate(Elvish, &mut cli::build_cli(), "gpat-cli", &mut io::stdout());
         }
 
     }
@@ -55,7 +55,7 @@ async fn main(){
         let id = matches.value_of("student ID Number").unwrap().to_string();
         let password = matches.value_of("password").unwrap().to_string();
         let user_name = matches.value_of("user name").unwrap().to_string();
-        let token = matches.value_of("Pasonal Access Token").unwrap().to_string();
+        let token = matches.value_of("Personal Access Token").unwrap().to_string();
 
         /*
         println!("id={}",id);
@@ -102,7 +102,7 @@ async fn main(){
         let mut save_file_path = dirs::home_dir().unwrap();
         save_file_path.push(".gpatinfo");
         //書き込み準備
-        let mut gpad_info_file = match File::create(save_file_path){
+        let mut gpat_info_file = match File::create(save_file_path){
             Ok(file) => file,
             Err(_) => {
                 println!("File Open Error");
@@ -110,7 +110,7 @@ async fn main(){
             }
         };
         //書き込み
-        match gpad_info_file.write_all(encrypted_user_info.as_bytes()){
+        match gpat_info_file.write_all(encrypted_user_info.as_bytes()){
             Ok(_) => std::process::exit(0),
             Err(_) => {
                     println!("File Write Error");
@@ -265,7 +265,7 @@ fn _gen_password(size: usize,seed:u64) -> String {
 
 
     async fn _http_post(api_end_point:&str, user_auth_info:Vec<String>) -> Vec<String>{
-        let api_root = "http://api.main.noko1024.net".to_string();
+        let api_root = "https://api.main.noko1024.net".to_string();
         let request_body:String;
 
         if user_auth_info.len() <= 2{
@@ -320,7 +320,7 @@ fn _gen_password(size: usize,seed:u64) -> String {
             process::exit(1)
         }
         else if status_code == 404{
-            println!("Error:Client Adress Error");
+            println!("Error:Client address error");
             println!("Please contact the developer.");
             let _res = response_data.text().await;
             //let res_text = res.unwrap();
