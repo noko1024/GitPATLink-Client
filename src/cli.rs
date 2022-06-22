@@ -2,8 +2,8 @@ use clap::{Command,Arg,AppSettings};
 
 
 pub fn  build_cli() -> Command<'static>{
-    let app = Command::new("gpad-cli")
-    .version("0.0.1")
+    let app = Command::new("gpat-cli")
+    .version("1.0.1")
     .author("noko1024")
     .about("GitPATLink CLI Client")
     .setting(AppSettings::DeriveDisplayOrder)
